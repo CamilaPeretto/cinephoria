@@ -1,4 +1,7 @@
 export const getApiKey = () => {
-  const key = localStorage.getItem("cinephoria_api_key");
-  return key ? key : import.meta.env.VITE_API_KEY;
+	return (
+		import.meta.env.VITE_API_KEY || localStorage.getItem("cinephoria_api_key")
+	);
 };
+
+export const BASE_URL = "https://api.themoviedb.org/3";

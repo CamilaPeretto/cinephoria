@@ -1,53 +1,62 @@
-import React from 'react';
+import { ChevronLeft, ChevronRight } from "lucide-react";
 
 export default function Pagination({ currentPage, totalPages, onPageChange }) {
-  if (totalPages <= 1) return null; // esconde se só tiver 1 página
+	if (totalPages <= 1) return null;
 
-  const handlePrev = () => {
-    if (currentPage > 1) onPageChange(currentPage - 1);
-  };
+	const handlePrev = () => currentPage > 1 && onPageChange(currentPage - 1);
+	const handleNext = () =>
+		currentPage < totalPages && onPageChange(currentPage + 1);
 
-  const handleNext = () => {
-    if (currentPage < totalPages) onPageChange(currentPage + 1);
-  };
+	const renderPageNumbers = () => {
+		const pages = [];
+		const maxVisible = 3;
 
-  const renderPageNumbers = () => {
-    const pages = [];
-    for (let i = 1; i <= totalPages; i++) {
-      pages.push(
-        <button
-          key={i}
-          onClick={() => onPageChange(i)}
-          className={`px-3 py-1 rounded ${
-            i === currentPage ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700'
-          }`}
-        >
-          {i}
-        </button>
-      );
-    }
-    return pages;
-  };
+		let start = Math.max(1, currentPage - Math.floor(maxVisible / 2));
+		let end = start + maxVisible - 1;
 
-  return (
-    <div className="flex justify-center items-center gap-2 mt-6 flex-wrap">
-      <button
-        onClick={handlePrev}
-        disabled={currentPage === 1}
-        className="px-3 py-1 bg-gray-200 rounded disabled:opacity-50"
-      >
-        ◀
-      </button>
+		if (end > totalPages) {
+			end = totalPages;
+			start = Math.max(1, end - maxVisible + 1);
+		}
 
-      {renderPageNumbers()}
+		for (let i = start; i <= end; i++) {
+			pages.push(
+				<button
+					key={i}
+					onClick={() => onPageChange(i)}
+					className={`px-3 py-1 rounded transition ${
+						i === currentPage
+							? "bg-indigo-600 text-white"
+							: "bg-slate-200 text-slate-700 hover:bg-slate-300"
+					}`}
+				>
+					{i}
+				</button>
+			);
+		}
 
-      <button
-        onClick={handleNext}
-        disabled={currentPage === totalPages}
-        className="px-3 py-1 bg-gray-200 rounded disabled:opacity-50"
-      >
-        ▶
-      </button>
-    </div>
-  );
+		return pages;
+	};
+
+	return (
+		<div className="flex justify-center items-center gap-2 mt-6 flex-wrap">
+			<button
+				onClick={handlePrev}
+				disabled={currentPage === 1}
+				className="px-3 py-1 bg-slate-200 rounded disabled:opacity-50 hover:bg-slate-300 disabled:hover:bg-slate-200"
+			>
+				<ChevronLeft className="w-5 h-5" />
+			</button>
+
+			{renderPageNumbers()}
+
+			<button
+				onClick={handleNext}
+				disabled={currentPage === totalPages}
+				className="px-3 py-1 bg-slate-200 rounded disabled:opacity-50 hover:bg-slate-300 disabled:hover:bg-slate-200"
+			>
+				<ChevronRight className="w-5 h-5" />
+			</button>
+		</div>
+	);
 }

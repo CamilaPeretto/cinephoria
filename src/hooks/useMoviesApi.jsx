@@ -1,36 +1,42 @@
 import { useState, useEffect } from "react";
-import { moviesService } from "../services/moviesService.js";
+import { tmdb } from "../api/tmdb.js";
 
 export const useMoviesApi = () => {
-  const [movies, setMovies] = useState([]);
-  const [query, setQuery] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
+	const [movies, setMovies] = useState([]);
+	const [query, setQuery] = useState("");
+	const [page, setPage] = useState(1);
+	const [totalPages, setTotalPages] = useState(1);
+	const [loading, setLoading] = useState(false);
+	const [error, setError] = useState(null);
 
-  const fetchMovies = async (searchTerm = "") => {
-    setLoading(true);
-    setError(null);
-    try {
-      let result;
-      if (searchTerm) {
-        result = await moviesService.searchMovies(searchTerm);
-      } else {
-        result = await moviesService.getPopularMovies(1);
-      }
+	useEffect(() => {
+		const fetchMovies = async () => {
+			setLoading(true);
+			setError(null);
 
-      if (result.error) throw new Error(result.error);
-      setMovies(result.data.results.slice(0, 20));
-    } catch (err) {
-      setError(err.message);
-      setMovies([]);
-    } finally {
-      setLoading(false);
-    }
-  };
+			try {
+				let response;
+				if (query) {
+					response = await tmdb.searchMovies(query, page);
+				} else {
+					response = await tmdb.getPopularMovies(page);
+				}
 
-  useEffect(() => {
-    fetchMovies(query);
-  }, [query]);
+				if (response.error) throw new Error(response.error);
 
-  return { movies, loading, error, query, setQuery, fetchMovies };
+				setMovies(response.data.results || []);
+				setTotalPages(response.data.total_pages || 1);
+			} catch (err) {
+				setError(err.message);
+				setMovies([]);
+				setTotalPages(1);
+			} finally {
+				setLoading(false);
+			}
+		};
+
+		fetchMovies();
+	}, [query, page]);
+
+	return { movies, loading, error, setQuery, page, setPage, totalPages };
 };

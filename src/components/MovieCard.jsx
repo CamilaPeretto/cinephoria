@@ -1,57 +1,59 @@
-import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { useFavorites } from "../hooks/useFavorites.js";
+import { Heart, HeartOff, Info } from "lucide-react";
 
-export default function MovieCard({ movie, onFavorite }) {
-  const [isFavorite, setIsFavorite] = useState(false);
+export default function MovieCard({ movie }) {
+	const { isFavorite, addFavorite, removeFavorite } = useFavorites();
+	const navigate = useNavigate();
 
-  useEffect(() => {
-    const favorites = JSON.parse(localStorage.getItem("favorites")) || [];
-    setIsFavorite(favorites.some((fav) => fav.id === movie.id));
-  }, [movie.id]);
+	const toggleFavorite = () => {
+		isFavorite(movie.id) ? removeFavorite(movie.id) : addFavorite(movie);
+	};
 
-  const handleFavorite = () => {
-    const favorites = JSON.parse(localStorage.getItem("favorites")) || [];
-    let updatedFavorites;
-    if (isFavorite) {
-      updatedFavorites = favorites.filter((fav) => fav.id !== movie.id);
-    } else {
-      updatedFavorites = [...favorites, movie];
-    }
-    localStorage.setItem("favorites", JSON.stringify(updatedFavorites));
-    setIsFavorite(!isFavorite);
-    onFavorite && onFavorite(updatedFavorites);
-  };
+	const openDetails = () => navigate(`/details/${movie.id}`);
 
-  const handleDetails = () => {
-    alert(`Detalhes de ${movie.title}`);
-  };
+	return (
+		<div className="bg-slate-800 rounded overflow-hidden relative shadow hover:shadow-lg transition">
+			<img
+				src={
+					movie.poster_path
+						? `https://image.tmdb.org/t/p/w500${movie.poster_path}`
+						: "https://via.placeholder.com/500x750?text=Sem+Imagem"
+				}
+				alt={movie.title}
+				className="w-full object-cover"
+			/>
 
-  return (
-    <div className="bg-gray-800 rounded overflow-hidden relative">
-      <img
-        src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
-        alt={movie.title}
-        className="w-full h-64 object-cover"
-      />
-      <div className="p-2 text-white">
-        <h3 className="font-bold">{movie.title}</h3>
-        <p className="text-sm text-gray-300">{movie.release_date}</p>
-        <div className="flex justify-between mt-2">
-          <button
-            onClick={handleFavorite}
-            className={`px-2 py-1 rounded ${
-              isFavorite ? "bg-red-500" : "bg-gray-600"
-            }`}
-          >
-            {isFavorite ? "❤️ Favorito" : "🤍 Favorito"}
-          </button>
-          <button
-            onClick={handleDetails}
-            className="px-2 py-1 bg-blue-600 rounded"
-          >
-            Detalhes
-          </button>
-        </div>
-      </div>
-    </div>
-  );
+			<div className="p-2 text-white">
+				<h3 className="font-bold truncate">{movie.title}</h3>
+				<p className="text-sm text-slate-300">
+					{movie.release_date || "Sem data"}
+				</p>
+
+				<div className="flex justify-center mt-4 gap-6">
+					<button
+						onClick={toggleFavorite}
+						className="flex items-center gap-1 text-xs sm:text-sm px-2 sm:px-3 py-1 rounded bg-rose-600 hover:bg-rose-700 transition text-white"
+					>
+						{isFavorite(movie.id) ? (
+							<>
+								<HeartOff className="w-4 h-4" />
+							</>
+						) : (
+							<>
+								<Heart className="w-4 h-4" />
+							</>
+						)}
+					</button>
+
+					<button
+						onClick={openDetails}
+						className="flex items-center gap-1 text-xs sm:text-sm px-2 sm:px-3 py-1 bg-indigo-600 rounded hover:bg-indigo-700 transition text-white"
+					>
+						<Info className="w-4 h-4" />
+					</button>
+				</div>
+			</div>
+		</div>
+	);
 }
