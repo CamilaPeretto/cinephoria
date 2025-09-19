@@ -23,19 +23,6 @@ Ela permite que usuários busquem filmes, visualizem detalhes completos e montem
 
 ---
 
-## 🖼️ Demonstração
-
-### 🔍 Página de busca
-Interface para pesquisar filmes e navegar pelos resultados.  
-
-### 🎬 Detalhes do filme
-Exibe as informações completas, incluindo diretor e elenco.  
-
-### ❤️ Lista de favoritos
-Área exclusiva para armazenar seus filmes favoritos.  
-
----
-
 ## 🛠️ Tecnologias Utilizadas
 
 - **[React](https://react.dev/)** → Biblioteca principal  
